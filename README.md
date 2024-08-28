@@ -14,7 +14,8 @@ This project demonstrates how to monitor data drift and model performance using 
 
     ```sh
     git clone https://github.com/Moctader/drift-detection-in-stock-data.git
-    cd your-repo
+    cd drift-detection-in-stock-data
+
     ```
 
 2. **Create and activate a virtual environment**:
