@@ -79,14 +79,17 @@ def get_dataset_drift_report(reference: pd.DataFrame, current: pd.DataFrame, col
 def get_model_performance_report(reference: pd.DataFrame, current: pd.DataFrame, column_mapping: ColumnMapping):
     """Returns a model performance report."""
     model_performance_report = Report(metrics=[RegressionPreset()])
+
+    # Run the report
     model_performance_report.run(reference_data=reference, current_data=current, column_mapping=column_mapping)
- 
+
     return model_performance_report
 
 def detect_dataset_drift(report: Report):
     """Detect dataset drift from the report."""
-    print(report.as_dict())
-    print(report.as_dict()["metrics"][0]["result"]["share_of_drifted_columns"])
+    #print(report.as_dict())
+    #print(report.as_dict()["metrics"][0]["result"]["share_of_drifted_columns"])
+
     return report.as_dict()["metrics"][0]["result"]["dataset_drift"]
 
 def process_data_in_chunks(df):
@@ -102,13 +105,13 @@ def process_data_in_chunks(df):
 
         # Reference data
         reference_data = df.iloc[start_idx_ref:end_idx_ref]
-        print(f"Processing reference data chunk {i + 1}")
-        print(reference_data.head())
+        # print(f"Processing reference data chunk {i + 1}")
+        # print(reference_data.head())
 
         # Current data
         current_data = df.iloc[start_idx_cur:end_idx_cur]
-        print(f"Processing current data chunk {i + 2}")
-        print(current_data.head())
+        # print(f"Processing current data chunk {i + 2}")
+        # print(current_data.head())
         #plot_distributions(reference_data, current_data)
         #bar_plot_distributions(reference_data, current_data)
         # Perform drift detection and model performance evaluation
