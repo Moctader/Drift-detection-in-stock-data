@@ -77,12 +77,19 @@ def process_time_series_data(df: pd.DataFrame, window_size: int, split_ratio: fl
 def detect_drift(reference_data: pd.DataFrame, current_data: pd.DataFrame) -> pd.DataFrame:
     """
     Detect drift using Evidently library and return the results.
+
+    Here are the names of the statistical tests available in evidently for data drift detection:
+
+    psi - Population Stability Index
+    ks - Kolmogorov-Smirnov Test
+    chi2 - Chi-Squared Test
+    cvm - Cramér-Von Mises Test
     """
     # Define ColumnMapping
     column_mapping = ColumnMapping()
     
     # Create the report
-    report = Report(metrics=[DataDriftPreset()])
+    report = Report(metrics=[DataDriftPreset(stattest='ks', stattest_threshold='-3')])
     report.run(reference_data=reference_data, current_data=current_data, column_mapping=column_mapping)
     report_file=report.save_html("drift_detection_report.html")
     
