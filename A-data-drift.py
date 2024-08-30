@@ -10,7 +10,7 @@ from sqlalchemy import create_engine
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 import uvicorn
-from func import process_time_series_data, detect_drift
+from func import process_time_series_data, detect_data_drift, model_drift_detection
 
 
 app = FastAPI()
@@ -58,8 +58,6 @@ def read_data() -> pd.DataFrame:
 
 
 
-
-
 @app.get('/detect-drift')
 def detect_drift_endpoint(window_size: int = 3000) -> FileResponse:
     logging.info('Read data from database')
@@ -71,10 +69,9 @@ def detect_drift_endpoint(window_size: int = 3000) -> FileResponse:
 
     # Prepare data for drift detection
     try:
-        #prepare_data_for_drift_detection(df, window_size)
-        #reference_data, current_data = 
-        reference, target=process_time_series_data(df, window_size=3000)
-        detect_drift(reference, target)
+        reference, current=process_time_series_data(df, window_size=3000)
+        detect_data_drift(reference, current)
+
     except ValueError as e:
         logging.error(f"Error preparing data: {e}")
         return {"error": str(e)}
@@ -85,6 +82,34 @@ def detect_drift_endpoint(window_size: int = 3000) -> FileResponse:
     report_path=f"drift_detection_report.html"
     # Return the file as a response
     return FileResponse(report_path)
+
+@app.get('/monitor-model')
+def monitor_model_performance(window_size: int = 3000) -> FileResponse:
+    logging.info('Read data from database')
+
+    # Read data from the database
+    df = read_data()
+    if df.empty:
+        return {"error": "No data found or an error occurred while reading the data."}
+
+    # Prepare data for drift detection
+    try:
+        reference, current=process_time_series_data(df, window_size=3000)
+        model_drift_detection(reference, current)
+
+    except ValueError as e:
+        logging.error(f"Error preparing data: {e}")
+        return {"error": str(e)}
+
+    # Detect drift
+
+    logging.info('Drift detection completed and results saved.')
+    report_path=f"model_performance_report.html"
+    # Return the file as a response
+    return FileResponse(report_path)
+
+
+
 
 # Run the application with Uvicorn (optional, usually done from command line)
 if __name__ == "__main__":

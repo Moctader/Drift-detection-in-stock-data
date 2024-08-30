@@ -10,6 +10,8 @@ from evidently.metric_preset import RegressionPreset, DataDriftPreset, TargetDri
 from sqlalchemy import create_engine
 from sklearn.preprocessing import StandardScaler
 import numpy as np
+from sklearn import ensemble
+from evidently import ColumnMapping
 
 def process_time_series_data(df: pd.DataFrame, window_size: int, split_ratio: float = 0.7) -> pd.DataFrame:
     """
@@ -64,17 +66,17 @@ def process_time_series_data(df: pd.DataFrame, window_size: int, split_ratio: fl
     split_index = int(len(df) * split_ratio)
     reference_data = df[:split_index]
     current_data = df[split_index:]
-    print("Reference Data:")
-    print(reference_data.shape)
-    print("Current Data:")
-    print(current_data.shape)
+    # print("Reference Data:")
+    # print(reference_data.shape)
+    # print("Current Data:")
+    # print(current_data.shape)
     
     # Return both reference and current data for further processing
     return reference_data, current_data
 
 
 
-def detect_drift(reference_data: pd.DataFrame, current_data: pd.DataFrame) -> pd.DataFrame:
+def detect_data_drift(reference_data: pd.DataFrame, current_data: pd.DataFrame) -> pd.DataFrame:
     """
     Detect drift using Evidently library and return the results.
 
@@ -89,10 +91,50 @@ def detect_drift(reference_data: pd.DataFrame, current_data: pd.DataFrame) -> pd
     column_mapping = ColumnMapping()
     
     # Create the report
-    report = Report(metrics=[DataDriftPreset(stattest='ks', stattest_threshold='-3')])
+    report = Report(metrics=[DataDriftPreset(stattest='ks', stattest_threshold='0.3')])
     report.run(reference_data=reference_data, current_data=current_data, column_mapping=column_mapping)
     report_file=report.save_html("drift_detection_report.html")
+
+  
+
     
     # Save the report to a CSV file
     
     #return report_file
+
+
+def get_model_performance_report(reference_data, current_data, column_mapping):
+    """Generate model performance report."""
+    report = Report(metrics=[RegressionPreset()])
+    report.run(reference_data=reference_data, current_data=current_data, column_mapping=column_mapping)
+    report_dict = report.as_dict()
+    print(report_dict)
+    
+    return report
+
+
+def model_drift_detection(reference_data, current_data):
+    """Detect drift in model performance."""
+    target = 'close'
+    prediction = 'prediction'
+    numerical_features = ['open', 'high', 'low', 'volume', 'previous_close']
+    categorical_features = []
+
+    regressor = ensemble.RandomForestRegressor(random_state=0, n_estimators=50)
+    regressor.fit(reference_data[numerical_features + categorical_features], reference_data[target])
+    ref_prediction = regressor.predict(reference_data[numerical_features + categorical_features])
+    current_prediction = regressor.predict(current_data[numerical_features + categorical_features])
+    
+    reference_data['prediction'] = ref_prediction
+    current_data['prediction'] = current_prediction
+
+    column_mapping = ColumnMapping()
+    column_mapping.target = target
+    column_mapping.prediction = prediction
+    column_mapping.numerical_features = numerical_features
+    column_mapping.categorical_features = categorical_features
+
+
+    model_performance_report = get_model_performance_report(reference_data, current_data, column_mapping)
+    model_performance_report.save_html(f"model_performance_report.html")
+
