@@ -3,3 +3,8 @@ models
 data
 workspace
 prefect
+__pycache__
+Target-drift
+model-performance
+data-drift
+grafana

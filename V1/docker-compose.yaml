@@ -1,28 +1,39 @@
 version: "3.9"
 services:
+  app:
+    build: .
+    environment:
+      - PREFECT_API_URL=http://host.docker.internal:4200
+    ports:
+      - 4200:4200
+    networks:
+      - monitoring
+    depends_on:
+      - prefect
+      - monitoring-db
+      - grafana
+
   # Prefect UI (Orion)
   prefect:
-    image: prefecthq/prefect:2-python3.11
+    image: prefecthq/prefect:2-python3.10
     restart: always
     volumes:
       - ./prefect:/root/.prefect
     entrypoint: ["prefect", "server", "start"]
     environment:
       - PREFECT_ORION_API_HOST=0.0.0.0
-      - PREFECT_ORION_DATABASE_CONNECTION_URL=postgresql+asyncpg://admin:admin@monitoring-db:5432/monitoring_db
     ports:
-      - 4201:4201
+      - 4200:4200
     networks:
       - monitoring
-
-  # PostgreSQL Database
+  
   monitoring-db:
     image: postgres:15.2-alpine
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: monitoring_db
-      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "admin"
+      POSTGRES_DB: "monitoring_db"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
     container_name: monitoring-db-postgres
     ports:
       - 5432:5432
@@ -36,7 +47,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # Grafana
   grafana:
     image: grafana/grafana:9.4.7
     container_name: grafana

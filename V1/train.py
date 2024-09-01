@@ -25,18 +25,7 @@ def train_model(df: pd.DataFrame) -> LinearRegression:
     train_preds = model.predict(X_train)
     val_preds = model.predict(X_val)
 
-    # # Calculate validation metrics: MAE
-    # print("Calculate validation metrics: MAE")
-    # print("Train MAE:", mean_absolute_error(y_train, train_preds))
-    # print("Validation MAE:", mean_absolute_error(y_val, val_preds))
 
-    # # Calculate validation metrics: MAPE
-    # print("Calculate validation metrics: MAPE")
-    # print("Train MAPE:", mean_absolute_percentage_error(y_train, train_preds))
-    # print("Validation MAPE:", mean_absolute_percentage_error(y_val, val_preds))
-
-    # # Save the model
-    # print("Save the model")
     joblib.dump(model, "models/model.joblib")
     
     return model

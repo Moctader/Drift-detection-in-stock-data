@@ -61,6 +61,7 @@ def generate_reports(
         current_data=current_data,
         column_mapping=column_mapping,
     )
+    model_performance_report.save_html("model-performance/model_performance_report.html")
 
     logging.info("Target drift report")
     target_drift_report = Report(metrics=[ColumnDriftMetric(target_col)])
@@ -69,6 +70,8 @@ def generate_reports(
         current_data=current_data,
         column_mapping=column_mapping,
     )
+    target_drift_report.save_html("Target-drift/Target-drift.html")
+
 
     logging.info("Save metrics to database")
     model_performance_report_content: Dict = model_performance_report.as_dict()

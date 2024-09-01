@@ -23,15 +23,8 @@ def prepare_reference_dataset(df: pd.DataFrame):
     reference_scoring_data = reference_data[features]
     reference_target_data = reference_data[target_col]
     
-    X_train, X_test, y_train, y_test = train_test_split(reference_scoring_data, reference_target_data, test_size=0.2, random_state=42)
-    model = LinearRegression()
-    model.fit(X_train, y_train)
-
-    # Save the trained model
-    MODEL_DIR = "models"
-    Path(MODEL_DIR).mkdir(exist_ok=True)
-    model_path = f"{MODEL_DIR}/linear_regression_model.joblib"
-    joblib.dump(model, model_path)
+    
+    model = joblib.load("models/model.joblib")
 
     reference_data[prediction_col] = model.predict(reference_scoring_data)
     
@@ -51,11 +44,7 @@ def load_model_and_predict(current_data: pd.DataFrame):
     prediction_col = "predictions"
     features = ['open', 'high', 'low', 'volume', 'previous_close']
     
-    # Load the trained model
-    MODEL_DIR = "models"
-    model_path = f"{MODEL_DIR}/linear_regression_model.joblib"
-    model = joblib.load(model_path)
-    print(f"Model loaded from {model_path}")
+    model = joblib.load("models/model.joblib")
 
     # Prepare scoring data for current data
     current_scoring_data = current_data[features]

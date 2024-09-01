@@ -66,7 +66,7 @@ def generate_reports(
         current_data=current_data,
         column_mapping=column_mapping,
     )
-    data_drift_report.save_html("1-data_drift_report.html")
+    data_drift_report.save_html("data-drift/data_drift_report.html")
 
     logging.info("Commit metrics into database")
     data_quality_report_content: Dict = data_quality_report.as_dict()
