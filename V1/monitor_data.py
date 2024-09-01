@@ -58,6 +58,8 @@ def generate_reports(
         current_data=current_data,
         column_mapping=column_mapping,
     )
+    data_quality_report.save_html("data_quality_report/data_quality_report.html")
+
 
     logging.info("Data drift report")
     data_drift_report = Report(metrics=[DataDriftPreset()])
