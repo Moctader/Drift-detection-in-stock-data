@@ -1,0 +1,56 @@
+###
+### A complete description of a Prefect Deployment for flow 'monitor-data'
+###
+name: Monitor Data2
+description: |-
+  Build and save data validation reports.
+
+  Args:
+      ts (str): ISO 8601 formatted timestamp.
+version: 4486e842724bdd6345f396a81078fd85
+# The work queue that will handle this deployment's runs
+work_queue_name: default
+work_pool_name: null
+tags: []
+parameters: {}
+schedule: null
+schedules: []
+is_schedule_active: null
+infra_overrides: {}
+infrastructure:
+  type: process
+  env: {}
+  labels: {}
+  name: null
+  command: null
+  stream_output: true
+  working_dir: null
+  block_type_slug: process
+  _block_type_slug: process
+
+###
+### DO NOT EDIT BELOW THIS LINE
+###
+flow_name: monitor-data
+manifest_path: null
+storage: null
+path: /Users/moctader/TrustworthyAI/Evidently-drift-detection
+entrypoint: monitor_data.py:monitor_data
+parameter_openapi_schema:
+  title: Parameters
+  type: object
+  properties:
+    current_data:
+      position: 0
+      title: current_data
+    ts:
+      description: ISO 8601 formatted timestamp.
+      position: 1
+      title: ts
+  required:
+  - current_data
+  - ts
+  definitions: null
+timestamp: '2024-09-01T08:53:38.132734+00:00'
+triggers: []
+enforce_parameter_schema: null

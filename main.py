@@ -15,6 +15,7 @@ from train import train_model
 from referncedata import prepare_reference_dataset
 from monitor_data import monitor_data
 import pendulum
+from monitor_model import monitor_model
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning, message="'H' is deprecated and will be removed in a future version, please use 'h' instead.")
 
@@ -25,7 +26,7 @@ app = FastAPI()
 logging.basicConfig(level=logging.INFO)
 
 # Database connection parameters
-DATABASE_URL = "postgresql://your_user:your_password@localhost:5432/your_database"
+DATABASE_URL = "postgresql://admin:admin@localhost:5432/monitoring_db"
 
 def read_data() -> pd.DataFrame:
     """Read data from PostgreSQL using SQLAlchemy and return only specified numerical features."""
@@ -64,7 +65,8 @@ if __name__ == "__main__":
     df = read_data()
     train_model(df)
     reference_data, current_data = prepare_reference_dataset(df)
-    ts = pendulum.now()
-    
+    ts = pendulum.now().to_iso8601_string()
+
     # Pass the ISO 8601 formatted timestamp to monitor_data
-    monitor_data(current_data, ts.to_iso8601_string())
+    monitor_data(current_data, ts)
+    monitor_model(current_data, ts) 
